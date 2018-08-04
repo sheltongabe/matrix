@@ -30,3 +30,9 @@
 *.exe
 *.out
 *.app
+
+# Pulled in dependent libraries
+src/json_util/
+
+# VS Code generated
+*.code-workspace
