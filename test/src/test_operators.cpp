@@ -12,6 +12,7 @@
 #include <iostream>
 
 #include "matrix/matrix.h"
+#include "json_util/json_file.h"
 
 /// Entry point into the code
 int main() {
@@ -34,5 +35,13 @@ int main() {
 	// Compare cross types
 	if(int3_3 != double3_3)
 		return 1;
+
+	// ----- Add Tests -----
+	matrix::Matrix<3, 3, int> add1 = int3_3 + int3_3_diff;
+	json::JSONFile::writeJSON(std::move("add_1.json"), add1);
+
+	matrix::Matrix<3, 3, double> double1 = double3_3 + int3_3_diff;
+	json::JSONFile::writeJSON(std::move("double_1.json"), double1);
+
 	return 0;
 }

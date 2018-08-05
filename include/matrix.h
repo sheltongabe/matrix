@@ -57,7 +57,7 @@ namespace matrix {
 			 * 
 			 * 	@version	0.1
 			 */
-			Matrix(Matrix& copy);
+			Matrix(const Matrix& copy);
 
 			/**
 			 * 	@brief	Move Constructor
@@ -107,12 +107,30 @@ namespace matrix {
 			inline bool operator!=(const Matrix<M, N, O>& rhs) const { 
 					return !(*this == rhs); }
 
+			/**
+			 * 	@brief  Add two Matrices of equal dimensions
+			 * 
+			 * 	Navigate and add the two matrices index-by-index
+			 * 	Result is stored as a type T
+			 * 
+			 * 	@param	const Matrix&		Right side of the addition
+			 * 	@return	  Matrix<M, N, T>	result of addition
+			 * 
+			 * 	@version 0.1
+			 */
+			template <typename O>
+			Matrix<M, N, T> operator+(const Matrix<M, N, O>& rhs) const;
+
 			// ----- Inline Methods -----
 			/// Get the width of the Matrix
 			inline int getWidth() const { return N; }
 
 			/// Get the number of rows in the matrix
 			inline int getHeight() const { return M; }
+
+			/// Get the matrix stored as a const&
+			inline const std::vector<std::vector<T>>& getMatrix() const { 
+					return this->matrix; }
 
 			/**
 			 * 	@brief 	Get the json form of the Matrix

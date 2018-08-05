@@ -43,7 +43,7 @@ namespace matrix {
 	// Copy Constructor
 	//
 	template<int M, int N, typename T>
-	Matrix<M, N, T>::Matrix(Matrix<M, N, T>& copy) : 
+	Matrix<M, N, T>::Matrix(const Matrix<M, N, T>& copy) : 
 			matrix(copy.matrix),
 			JSONAble(copy) {
 
@@ -90,19 +90,19 @@ namespace matrix {
 	// ----- Operator overloading -----
 
 	//
-	// operator== (const Matrix&) -> bool
+	// operator== (const Matrix<M, N, O>&) -> bool
 	//
 	template <int M, int N, typename T>
 	template <typename O>
 	bool Matrix<M, N, T>::operator==(const Matrix<M, N, O>& rhs) const {
-		// check for self-comparison
-		if(this == &rhs)
-			return true;
-
-		for(auto thisRow = this->matrix.begin(), rhsRow = rhs.matrix.begin();
+		// Compare value by value, cannot check for self comparison because
+		// of the ability to compare different types
+		auto rhsRow = rhs.getMatrix().begin();
+		for(auto thisRow = this->matrix.begin();
 				thisRow != this->matrix.end();
 				++thisRow, ++rhsRow) {
-			for(auto thisValue = thisRow->begin(), rhsValue = rhsRow->begin();
+			auto rhsValue = rhsRow->begin();
+			for(auto thisValue = thisRow->begin();
 					thisValue != thisRow->end();
 					++thisValue, ++rhsValue) {
 				if(*thisValue != *rhsValue)
@@ -112,6 +112,32 @@ namespace matrix {
 
 		// If we get through the array, return true
 		return true;
+	}
+
+	//
+	// operator+ (const Matrix<M, N, O>&) -> Matrix<M, N, T>
+	//
+	template <int M, int N, typename T>
+	template <typename O>
+	Matrix<M, N, T> Matrix<M, N, T>::
+			operator+(const Matrix<M, N, O>& rhs) const {
+		// Matrix storing result, copied from *this
+		Matrix<M, N, T> result(*this);
+
+		// Navigate the rhs and add to result index-by-index
+		auto thisRow = result.matrix.begin();
+		for(auto rhsRow = rhs.getMatrix().begin();
+				rhsRow != rhs.getMatrix().end(); 
+				++rhsRow, ++thisRow) {
+			auto thisValue = thisRow->begin();
+			for(auto rhsValue = rhsRow->begin();
+					rhsValue != rhsRow->end();
+					++rhsValue, ++thisValue) {
+				*thisValue += *rhsValue;
+			}
+		}
+
+		return std::move(result);
 	}
 
 	//
