@@ -7,7 +7,7 @@
  * 	by a matrix which follows the size rules.
  *  
  *  @author		Gabriel Shelton	sheltongabe
- *  @date		  08-04-2018
+ *  @date		  08-05-2018
  *  @version	0.1
  */
 
@@ -23,6 +23,8 @@ namespace matrix {
 	/**
 	 * 	@class		Matrix
 	 * 	@brief		Define the template for a matrix
+	 * 
+	 * 	Must be well formed for operators to function correctly
 	 * 
 	 * 	Stores things in a 2D math structure, that follow those three math rules
 	 * 
@@ -75,6 +77,34 @@ namespace matrix {
 			 */
 			Matrix(json::JSON j);
 
+			// ----- Operator overloads -----
+			/**
+			 * 	@brief  Compare two Matrices for equalivalency
+			 * 
+			 * 	Will first check for self comparision, then the dimensions, then the T
+			 * 	Then compare contents using operator==
+			 * 
+			 * 	@param	const Matrix&		Right side of the comparison
+			 * 	@return	  bool						  Result of the comparison
+			 * 
+			 * 	@version 0.1
+			 */
+			bool operator==(const Matrix& rhs) const;
+
+			/**
+			 * 	@brief  Compare two Matrices for in-equalivalency
+			 * 
+			 * 	Will use the previously declared operator== to compare
+			 * 	then invert the value
+			 * 
+			 * 	@param	const Matrix&		Right side of the comparison
+			 * 	@return	  bool						  Result of the comparison
+			 * 
+			 * 	@version 0.1
+			 */
+			inline bool operator!=(const Matrix& rhs) const { 
+					return !(*this == rhs); }
+
 			// ----- Inline Methods -----
 			/// Get the width of the Matrix
 			inline int getWidth() const { return N; }
@@ -108,5 +138,6 @@ namespace matrix {
 
 	};
 }
+
 #include "matrix.cpp"
 #endif
