@@ -33,6 +33,15 @@
 
 # Pulled in dependent libraries
 src/json_util/
+include/json_util/
+include/matrix/
 
 # VS Code generated
 *.code-workspace
+.vscode/
+
+# Directories
+bin/
+build/
+lib/
+test/results/
