@@ -89,7 +89,8 @@ namespace matrix {
 			 * 
 			 * 	@version 0.1
 			 */
-			bool operator==(const Matrix& rhs) const;
+			template <typename O>
+			bool operator==(const Matrix<M, N, O>& rhs) const;
 
 			/**
 			 * 	@brief  Compare two Matrices for in-equalivalency
@@ -102,7 +103,8 @@ namespace matrix {
 			 * 
 			 * 	@version 0.1
 			 */
-			inline bool operator!=(const Matrix& rhs) const { 
+			template <typename O>
+			inline bool operator!=(const Matrix<M, N, O>& rhs) const { 
 					return !(*this == rhs); }
 
 			// ----- Inline Methods -----

@@ -93,14 +93,11 @@ namespace matrix {
 	// operator== (const Matrix&) -> bool
 	//
 	template <int M, int N, typename T>
-	bool Matrix<M, N, T>::operator==(const Matrix& rhs) const {
+	template <typename O>
+	bool Matrix<M, N, T>::operator==(const Matrix<M, N, O>& rhs) const {
 		// check for self-comparison
 		if(this == &rhs)
 			return true;
-
-		// Check size
-		if(M != rhs.getHeight() || N != rhs.getWidth())
-			return false;
 
 		for(auto thisRow = this->matrix.begin(), rhsRow = rhs.matrix.begin();
 				thisRow != this->matrix.end();

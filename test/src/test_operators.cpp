@@ -31,16 +31,8 @@ int main() {
 	if(int3_3 == int3_3_diff)
 		return 1;
 
-	// // Compare cross types
-	// if(int3_3 != double3_3)
-	// 	return 1;
-
-	// // Compare cross size
-	// if(int3_3 == int3_2)
-	// 	return 1;
-
-	// if(int3_2 == double2_3)
-	// 	return 1;
-
+	// Compare cross types
+	if(int3_3 != double3_3)
+		return 1;
 	return 0;
 }
