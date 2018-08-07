@@ -7,7 +7,7 @@
  * 	by a matrix which follows the size rules.
  *  
  *  @author		Gabriel Shelton	sheltongabe
- *  @date		  08-05-2018
+ *  @date		  08-06-2018
  *  @version	0.1
  */
 
@@ -15,6 +15,7 @@
 #define MATRIX_H
 
 #include <vector>
+#include <functional>
 
 #include "json_util/jsonable.h"
 
@@ -121,6 +122,20 @@ namespace matrix {
 			template <typename O>
 			Matrix<M, N, T> operator+(const Matrix<M, N, O>& rhs) const;
 
+			/**
+			 * 	@brief  Multiply two Matrices of equal dimensions by a scalor O
+			 * 
+			 * 	Navigate and add the two matrices index-by-index
+			 * 	Result is stored as a type T
+			 * 
+			 * 	@param	const O&			   Right side of the multiplication
+			 * 	@return	  Matrix<M, N, T>	result of multiplication
+			 * 
+			 * 	@version 0.1
+			 */
+			template <typename O>
+			Matrix<M, N, T> operator*(const O& rhs) const;
+
 			// ----- Inline Methods -----
 			/// Get the width of the Matrix
 			inline int getWidth() const { return N; }
@@ -153,6 +168,23 @@ namespace matrix {
 		protected:
 			/// Where the matrix is actually stored
 			std::vector<std::vector<T>> matrix;
+
+			/**
+			 * 	@brief 	Navigate through a copy of this matrix and through the other matrixx applying the function
+			 * 
+			 *  Operation is a lambda / function to be applied to each index
+			 *	Addition, Subtraction, and Multiplication by a scalar will force
+			 * 	M == Q && R == N
+			 * 	Navigate by index and apply the function provided
+			 * 
+			 * 	@param	const Matrix<N, R, O>&						Matrix on the right of the operation
+			 * 	@param	std::function<T(const T&, constO&)>	Operation to apply to each index
+			 * 	@return	  Matrix<N, R, T>									Matrix built
+			 * 
+			 */
+			template <int Q, int R, typename O, typename Operation>
+			Matrix<M, R, T> forEachRhs(const Matrix<Q, R, O>& rhs,
+					Operation operation) const;
 
 		private:
 

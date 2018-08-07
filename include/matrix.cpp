@@ -5,12 +5,13 @@
  * 	Details
  *  
  *  @author		Gabriel Shelton	sheltongabe
- *  @date		  08-05-2018
+ *  @date		  08-06-2018
  *  @version	0.1
  */
 
 #include <algorithm>
 #include <stdexcept>
+#include <type_traits>
 
 #include "matrix.h"
 
@@ -97,7 +98,7 @@ namespace matrix {
 	bool Matrix<M, N, T>::operator==(const Matrix<M, N, O>& rhs) const {
 		// Compare value by value, cannot check for self comparison because
 		// of the ability to compare different types
-		auto rhsRow = rhs.getMatrix().begin();
+ 		auto rhsRow = rhs.getMatrix().begin();
 		for(auto thisRow = this->matrix.begin();
 				thisRow != this->matrix.end();
 				++thisRow, ++rhsRow) {
@@ -108,7 +109,7 @@ namespace matrix {
 				if(*thisValue != *rhsValue)
 					return false;
 			}
-		}
+		} 
 
 		// If we get through the array, return true
 		return true;
@@ -122,19 +123,28 @@ namespace matrix {
 	Matrix<M, N, T> Matrix<M, N, T>::
 			operator+(const Matrix<M, N, O>& rhs) const {
 		// Matrix storing result, copied from *this
+
+		Matrix<M, N, T> result = this->forEachRhs(rhs,
+				 [&] (const T& left, const O& right) -> T {
+					 return std::move(left + right);
+				});
+
+		return std::move(result);
+	}
+
+	//
+	// operator* (const O&) -> Matrix<M, N, T>
+	//
+	template <int M, int N, typename T>
+	template <typename O>
+	Matrix<M, N, T> Matrix<M, N, T>::operator*(const O& scalar) const {
+		// The result after multiplication
 		Matrix<M, N, T> result(*this);
 
-		// Navigate the rhs and add to result index-by-index
-		auto thisRow = result.matrix.begin();
-		for(auto rhsRow = rhs.getMatrix().begin();
-				rhsRow != rhs.getMatrix().end(); 
-				++rhsRow, ++thisRow) {
-			auto thisValue = thisRow->begin();
-			for(auto rhsValue = rhsRow->begin();
-					rhsValue != rhsRow->end();
-					++rhsValue, ++thisValue) {
-				*thisValue += *rhsValue;
-			}
+		for(auto row = result.matrix.begin(); row != result.matrix.end(); ++row) {
+			std::for_each(row->begin(), row->end(), [&] (T& item) {
+				item *= scalar;
+			});
 		}
 
 		return std::move(result);
@@ -172,6 +182,39 @@ namespace matrix {
 		j["matrix"] = std::move(arr);
 
 		return std::move(j);
+	}
+
+	//
+	// forEachRhs (const Matrix<N, R, O>&, std::function<T(const T&, const O&)) ->Matrix<M, R, T>
+	//
+	template <int M, int N, typename T>
+	template <int Q, int R, typename O, typename Operatorion>
+	Matrix<M, R, T> Matrix<M, N, T>::forEachRhs(const Matrix<Q, R, O>& rhs,
+			Operatorion operation) const {
+		// To store the result
+		Matrix<M, R, T> result(*this);
+		auto& resultMatrix = result.matrix;
+
+		// Grabs a reference to the rhs of the matrix
+		const auto& rightMatrix = rhs.getMatrix();
+		
+		// Tracks position in matrix
+		int row = 0, column = 0;
+
+		// Move accross the rows
+		auto resultRow = resultMatrix.begin();
+		for( ; row != M && row != Q; ++row, ++resultRow) {
+			// Move accross the columns
+			for(auto resultValue = resultRow->begin();
+					column != N && column != R;
+					++column, ++resultValue) {
+				*resultValue = operation(
+						*resultValue,
+						rightMatrix[row][column]);
+			}
+		}
+
+		return std::move(result);
 	}
 
 	//

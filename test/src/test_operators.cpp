@@ -5,7 +5,7 @@
  * 	Test each operator as it is added
  *  
  *  @author		Gabriel Shelton	sheltongabe
- *  @date	08-05-2018
+ *  @date		  08-06-2018
  *  @version	0.1
  */
 
@@ -42,6 +42,13 @@ int main() {
 
 	matrix::Matrix<3, 3, double> double1 = double3_3 + int3_3_diff;
 	json::JSONFile::writeJSON(std::move("double_1.json"), double1);
+
+	// ----- Scalar multiply tests -----
+	matrix::Matrix<3, 3, int> add3_3_doubled = int3_3 * 2;
+	json::JSONFile::writeJSON(std::move("add3_3_doubled.json"), add3_3_doubled);
+
+	matrix::Matrix<3, 3, double> double3_3_doubled = double3_3 * 0.5;
+	json::JSONFile::writeJSON(std::move("double3_3_doubled.json"), double3_3_doubled);
 
 	return 0;
 }
