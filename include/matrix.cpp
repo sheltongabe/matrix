@@ -5,7 +5,7 @@
  * 	Details
  *  
  *  @author		Gabriel Shelton	sheltongabe
- *  @date		  08-06-2018
+ *  @date		  08-09-2018
  *  @version	0.1
  */
 
@@ -91,63 +91,99 @@ namespace matrix {
 	// ----- Operator overloading -----
 
 	//
-	// operator== (const Matrix<M, N, O>&) -> bool
+	// operator == (const Matrix<M, N, T>&) -> bool
 	//
 	template <int M, int N, typename T>
-	template <typename O>
-	bool Matrix<M, N, T>::operator==(const Matrix<M, N, O>& rhs) const {
-		// Compare value by value, cannot check for self comparison because
-		// of the ability to compare different types
- 		auto rhsRow = rhs.getMatrix().begin();
-		for(auto thisRow = this->matrix.begin();
-				thisRow != this->matrix.end();
-				++thisRow, ++rhsRow) {
-			auto rhsValue = rhsRow->begin();
-			for(auto thisValue = thisRow->begin();
-					thisValue != thisRow->end();
-					++thisValue, ++rhsValue) {
-				if(*thisValue != *rhsValue)
+	bool Matrix<M, N, T>::operator ==(const Matrix<M, N, T>& rhs) const {
+		// Check for self comparison
+		if(this == &rhs)
+			return true;
+
+		// Move over the matrix and check for any inequalities
+		for(int row = 0; row < M; ++row) {
+			for(int col = 0; col < N; ++col) {
+				if(this->matrix[row][col] != rhs.matrix[row][col])
 					return false;
 			}
-		} 
+		}
 
 		// If we get through the array, return true
 		return true;
 	}
 
+
 	//
-	// operator+ (const Matrix<M, N, O>&) -> Matrix<M, N, T>
+	// operator += (const Matrix<M, N, T>&) -> Matrix<M, N, T>&
 	//
 	template <int M, int N, typename T>
-	template <typename O>
-	Matrix<M, N, T> Matrix<M, N, T>::
-			operator+(const Matrix<M, N, O>& rhs) const {
-		// Matrix storing result, copied from *this
+	Matrix<M, N, T>& Matrix<M, N, T>::operator += (const Matrix<M, N, T>& rhs) {
+		// Do the addition to each index of this
+		this->forEachIndex(rhs, [] (const T& left, const T& right) {
+			return left + right;
+		});
 
-		Matrix<M, N, T> result = this->forEachRhs(rhs,
-				 [&] (const T& left, const O& right) -> T {
-					 return std::move(left + right);
-				});
-
-		return std::move(result);
+		return *this;
 	}
+
+	//
+	// operator + (const Matrix<M, N, T>&) -> Matrix<M, N, T>
+	//
+	template <int M, int N, typename T>
+	Matrix<M, N, T> Matrix<M, N, T>::operator + (const Matrix<M, N, T>& rhs) {
+		// perform the addition, and copy this to result
+		(*this) += rhs;
+
+		// Return a copy of this, for chaining
+		return *this;
+	}
+
+	//
+	// operator -= (const Matrix<M, N, T>&) -> Matrix<M, N, T>&
+	//
+	template<int M, int N, typename T>
+	Matrix<M, N, T>& Matrix<M, N, T>::operator -= (const Matrix<M, N, T>& rhs) {
+		// Subtract from each index of this, using rhs as an input
+		this->forEachIndex(rhs, [] (const T& left, const T& right) {
+			return left - right;
+		});
+
+		return *this;
+	}
+
+	//
+	// operator - (const Matrix<M, N, O>&) -> Matrix<M, N, T>
+	//
+	template <int M, int N, typename T>
+	Matrix<M, N, T> Matrix<M, N, T>::operator - (const Matrix<M, N, T>& rhs) {
+		// Use the already implemented -= operator
+		(*this) -= rhs;
+
+		return *this;
+	}
+
+	//
+	// operator *= (const T& scalar) -> Matrix<M, N, T>
+	//
+	template <int M, int N, typename T>
+	Matrix<M, N, T>& Matrix<M, N, T>::operator *= (const T& scalar) {
+		// Take each element in this and multiply it by scalar
+		this->forEachIndex(*this, [=, &scalar] (const T& left, const T& right) {
+			return scalar * right;
+		});
+
+		return *this;
+	}
+
 
 	//
 	// operator* (const O&) -> Matrix<M, N, T>
 	//
 	template <int M, int N, typename T>
-	template <typename O>
-	Matrix<M, N, T> Matrix<M, N, T>::operator*(const O& scalar) const {
-		// The result after multiplication
-		Matrix<M, N, T> result(*this);
+	Matrix<M, N, T> Matrix<M, N, T>::operator * (const T& scalar) {
+		// Use the existing *= operator
+		(*this) *= scalar;
 
-		for(auto row = result.matrix.begin(); row != result.matrix.end(); ++row) {
-			std::for_each(row->begin(), row->end(), [&] (T& item) {
-				item *= scalar;
-			});
-		}
-
-		return std::move(result);
+		return *this;
 	}
 
 	//
@@ -185,37 +221,22 @@ namespace matrix {
 	}
 
 	//
-	// forEachRhs (const Matrix<N, R, O>&, std::function<T(const T&, const O&)) ->Matrix<M, R, T>
+	// forEachRhs (const Matrix<M, N, T>&, 
+	// std::function<T(const T&, const T&)) -> void
 	//
 	template <int M, int N, typename T>
-	template <int Q, int R, typename O, typename Operatorion>
-	Matrix<M, R, T> Matrix<M, N, T>::forEachRhs(const Matrix<Q, R, O>& rhs,
-			Operatorion operation) const {
-		// To store the result
-		Matrix<M, R, T> result(*this);
-		auto& resultMatrix = result.matrix;
-
-		// Grabs a reference to the rhs of the matrix
-		const auto& rightMatrix = rhs.getMatrix();
-		
-		// Tracks position in matrix
-		int row = 0, column = 0;
-
-		// Move accross the rows
-		auto resultRow = resultMatrix.begin();
-		for( ; row != M && row != Q; ++row, ++resultRow) {
-			// Move accross the columns
-			for(auto resultValue = resultRow->begin();
-					column != N && column != R;
-					++column, ++resultValue) {
-				*resultValue = operation(
-						*resultValue,
-						rightMatrix[row][column]);
+	template <typename Operation>
+	void Matrix<M, N, T>::forEachIndex(const Matrix<M, N, T>& rhs,
+			Operation operation) {
+		// Navigate the 2D Matrix
+		for(int row = 0; row < M; ++row) {
+			for(int col = 0; col < N; ++col) {
+				// Apply the operation and store the returned value to the matrix
+				this->matrix[row][col] = operation(this->matrix[row][col], rhs.matrix[row][col]);
 			}
 		}
-
-		return std::move(result);
 	}
+
 
 	//
 	// Destructor 

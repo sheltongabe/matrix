@@ -7,7 +7,7 @@
  * 	by a matrix which follows the size rules.
  *  
  *  @author		Gabriel Shelton	sheltongabe
- *  @date		  08-06-2018
+ *  @date		  08-09-2018
  *  @version	0.1
  */
 
@@ -80,61 +80,93 @@ namespace matrix {
 
 			// ----- Operator overloads -----
 			/**
-			 * 	@brief  Compare two Matrices for equalivalency
-			 * 
-			 * 	Will first check for self comparision, then the dimensions, then the T
-			 * 	Then compare contents using operator==
-			 * 
-			 * 	@param	const Matrix&		Right side of the comparison
-			 * 	@return	  bool						  Result of the comparison
-			 * 
-			 * 	@version 0.1
-			 */
-			template <typename O>
-			bool operator==(const Matrix<M, N, O>& rhs) const;
-
-			/**
 			 * 	@brief  Compare two Matrices for in-equalivalency
 			 * 
 			 * 	Will use the previously declared operator== to compare
 			 * 	then invert the value
 			 * 
 			 * 	@param	const Matrix&		Right side of the comparison
+			 * 	@return	  bool						 Result of the comparison
+			 * 
+			 * 	@version 0.1
+			 */
+			inline bool operator!=(const Matrix<M, N, T>& rhs) const { 
+					return !(*this == rhs); }
+
+			/**
+			 * 	@brief  Compare two Matrices for equalivalency
+			 * 
+			 * 	Will first check for self comparision
+			 * 	Then compare contents using operator==
+			 * 
+			 * 	@param	const Matrix&		 Right side of the comparison
 			 * 	@return	  bool						  Result of the comparison
 			 * 
 			 * 	@version 0.1
 			 */
-			template <typename O>
-			inline bool operator!=(const Matrix<M, N, O>& rhs) const { 
-					return !(*this == rhs); }
+			bool operator==(const Matrix<M, N, T>& rhs) const;
+
+			/**
+			 * 	@brief 	Implement for when a Matrix of equivalent dimension is added to this one
+			 * 
+			 * @param const Matrix&			Reference to rhs of operation
+			 * @return Matrix<M, N, T>&	  Reference to this
+			 */
+			Matrix<M, N, T>& operator += (const Matrix<M, N, T>& rhs);
 
 			/**
 			 * 	@brief  Add two Matrices of equal dimensions
 			 * 
-			 * 	Navigate and add the two matrices index-by-index
-			 * 	Result is stored as a type T
+			 * 	Use the already implemented += operator
+			 * 	and return a copy of this
 			 * 
 			 * 	@param	const Matrix&		Right side of the addition
 			 * 	@return	  Matrix<M, N, T>	result of addition
 			 * 
 			 * 	@version 0.1
 			 */
-			template <typename O>
-			Matrix<M, N, T> operator+(const Matrix<M, N, O>& rhs) const;
+			Matrix<M, N, T> operator + (const Matrix<M, N, T>& rhs);
 
 			/**
-			 * 	@brief  Multiply two Matrices of equal dimensions by a scalor O
+			 * 	@brief 	Implement for when a Matrix of equivalent dimension is subtracted from this one
 			 * 
-			 * 	Navigate and add the two matrices index-by-index
-			 * 	Result is stored as a type T
+			 * @param const Matrix&			Reference to rhs of operation
+			 * @return Matrix<M, N, T>&	  Reference to this
+			 */
+			Matrix<M, N, T>& operator -= (const Matrix<M, N, T>& rhs);
+
+			/**
+			 * 	@brief  Subtract two Matrices of equal dimensions
 			 * 
-			 * 	@param	const O&			   Right side of the multiplication
+			 * 	Use the already implemented -= operator,
+			 * 	and return a copy of this
+			 * 
+			 * 	@param	const Matrix&		Right side of the subtraction
+			 * 	@return	  Matrix<M, N, T>	result of subtraction
+			 * 
+			 * 	@version 0.1
+			 */
+			Matrix<M, N, T> operator - (const Matrix<M, N, T>& rhs);
+
+			/**
+			 * 	@brief 	Implement for when the matrix is multiplied by a scalar
+			 * 
+			 * @param const T&					Reference to rhs of operation
+			 * @return Matrix<M, N, T>&	  Reference to this
+			 */
+			Matrix<M, N, T>& operator *= (const T& scalar);
+
+			/**
+			 * 	@brief  Multiply a Matrix by a scalor T
+			 * 
+			 * 	Use the already implemented *= code to implement it
+			 * 
+			 * 	@param	const T&			   Right side of the multiplication
 			 * 	@return	  Matrix<M, N, T>	result of multiplication
 			 * 
 			 * 	@version 0.1
 			 */
-			template <typename O>
-			Matrix<M, N, T> operator*(const O& rhs) const;
+			Matrix<M, N, T> operator * (const T& scalar);
 
 			// ----- Inline Methods -----
 			/// Get the width of the Matrix
@@ -170,21 +202,21 @@ namespace matrix {
 			std::vector<std::vector<T>> matrix;
 
 			/**
-			 * 	@brief 	Navigate through a copy of this matrix and through the other matrixx applying the function
+			 * 	@brief 	Navigate through the left and through the other matrix, applying the function
 			 * 
 			 *  Operation is a lambda / function to be applied to each index
-			 *	Addition, Subtraction, and Multiplication by a scalar will force
-			 * 	M == Q && R == N
+			 * 	The first paramater of Operation is from this matrix, the other: rhs
+			 *	Addition, Subtraction, and Multiplication, good examples
 			 * 	Navigate by index and apply the function provided
 			 * 
-			 * 	@param	const Matrix<N, R, O>&						Matrix on the right of the operation
-			 * 	@param	std::function<T(const T&, constO&)>	Operation to apply to each index
+			 * 	@param	const Matrix<M, N, T>&						Matrix on the right of the operation
+			 * 	@param	std::function<T(const T&, constT&)>	Operation to apply to each index
 			 * 	@return	  Matrix<N, R, T>									Matrix built
 			 * 
 			 */
-			template <int Q, int R, typename O, typename Operation>
-			Matrix<M, R, T> forEachRhs(const Matrix<Q, R, O>& rhs,
-					Operation operation) const;
+			template <typename Operation>
+			void forEachIndex(const Matrix<M, N, T>& rhs,
+					Operation operation);
 
 		private:
 
