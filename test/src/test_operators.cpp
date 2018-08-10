@@ -63,6 +63,12 @@ int main() {
 			return 1;
 	}
 
+	// ----- Array subscript -----
+	{
+		Matrix A(5);
+		A[0][1] = 4;
+		std::cout << A[0][1] << std::endl;
+	}
 
 	return 0;
 }

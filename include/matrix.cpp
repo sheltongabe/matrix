@@ -10,7 +10,6 @@
  */
 
 #include <algorithm>
-#include <stdexcept>
 #include <type_traits>
 
 #include "matrix.h"

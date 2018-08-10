@@ -16,6 +16,7 @@
 
 #include <vector>
 #include <functional>
+#include <stdexcept>
 
 #include "json_util/jsonable.h"
 
@@ -168,12 +169,47 @@ namespace matrix {
 			 */
 			Matrix<M, N, T> operator * (const T& scalar);
 
+			/**
+			 * 	@brief 	Overload for an l-value of the array-subscript operator
+			 * 
+			 * 	Check that the index less than the number of rows, and if so:
+			 * 	return the std::vector<T>&
+			 * 
+			 * 	@param	int							Index of row
+			 * 	@return   std::vector<T>&	row
+			 */
+			inline std::vector<T>& operator [] (unsigned int index) {
+				if(index < M)
+					return this->matrix[index];
+				else
+					throw std::out_of_range("Index must be within number of rows");
+			}
+
+			/**
+			 * 	@brief 	Overload for an r-value of the array-subscript operator
+			 * 
+			 * 	Check that the index less than the number of rows, and if so:
+			 * 	return the std::vector<T>&
+			 * 
+			 * 	@param				int							Index of row
+			 * 	@return   const std::vector<T>&		row
+			 */
+			inline const std::vector<T>& operator [] (unsigned int index) const {
+				if(index < M)
+					return this->matrix[index];
+				else
+					throw std::out_of_range("Index must be within number of rows");
+			}
+
 			// ----- Inline Methods -----
 			/// Get the width of the Matrix
 			inline int getWidth() const { return N; }
 
 			/// Get the number of rows in the matrix
 			inline int getHeight() const { return M; }
+
+			/// Get the number of indises in the matrix
+			inline int size() const { return M * N; }
 
 			/// Get the matrix stored as a const&
 			inline const std::vector<std::vector<T>>& getMatrix() const { 
