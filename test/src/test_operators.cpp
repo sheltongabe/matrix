@@ -5,7 +5,7 @@
  * 	Test each operator as it is added
  *  
  *  @author		Gabriel Shelton	sheltongabe
- *  @date		  08-09-2018
+ *  @date		  08-13-2018
  *  @version	0.1
  */
 
@@ -68,6 +68,14 @@ int main() {
 		Matrix A(5);
 		A[0][1] = 4;
 		std::cout << A[0][1] << std::endl;
+	}
+
+	// ----- getColumn() / getRow() -----
+	{
+		Matrix A(5);
+		A[0][1] = 4;
+		std::vector<int> col1 = A.getColumn(1);
+		std::cout << col1[0] << std::endl;
 	}
 
 	return 0;

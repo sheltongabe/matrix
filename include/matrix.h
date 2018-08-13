@@ -7,7 +7,7 @@
  * 	by a matrix which follows the size rules.
  *  
  *  @author		Gabriel Shelton	sheltongabe
- *  @date		  08-09-2018
+ *  @date		  08-13-2018
  *  @version	0.1
  */
 
@@ -78,6 +78,33 @@ namespace matrix {
 			 * 	@version 0.1
 			 */
 			Matrix(json::JSON j);
+
+			/**
+			 * 	@brief 	Add a row to the matrix
+			 * 
+			 * 	Ensure that the vector length is equal to N
+			 * 
+			 * @param 	std::vector<T>	Values to add to the matrix
+			 * 
+			 * 	@version 0.1
+			 */
+			inline void addRow(std::vector<T> row) {
+				this->matrix.push_back(row);
+			}
+
+			/**
+			 * 	@brief 	Add a column to the matrix
+			 * 
+			 * 	Ensure that the vector length is equal to M
+			 * 
+			 * @param 	std::vector<T>	Values to add to the matrix
+			 * 
+			 * 	@version 0.1
+			 */
+			void addColumn(std::vector<T> column) {
+				for(int i = 0; i < M; ++i)
+					this->matrix[i].push_back(column[i]);
+			}
 
 			// ----- Operator overloads -----
 			/**
@@ -201,6 +228,22 @@ namespace matrix {
 					throw std::out_of_range("Index must be within number of rows");
 			}
 
+			/// Get a column in vector form from the matrix
+			std::vector<T> getColumn(unsigned int index) const;
+
+			/// Get a row in vector form from the matrix
+			std::vector<T> getRow(unsigned int index) const {
+				// Check for invalid index
+				if(index >= M)
+					throw std::out_of_range("Index must be within number of rows");
+
+				std::vector<T> vec;
+				for(int i = 0; i < N; ++i)
+					vec.push_back(this->matrix[index][i]);
+
+				return std::move(vec);
+			}
+
 			// ----- Inline Methods -----
 			/// Get the width of the Matrix
 			inline int getWidth() const { return N; }
@@ -259,5 +302,6 @@ namespace matrix {
 	};
 }
 
-#include "matrix.cpp"
+#include "matrix/matrix.cpp"
+
 #endif

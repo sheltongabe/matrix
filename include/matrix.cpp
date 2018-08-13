@@ -5,7 +5,7 @@
  * 	Details
  *  
  *  @author		Gabriel Shelton	sheltongabe
- *  @date		  08-09-2018
+ *  @date		  08-13-2018
  *  @version	0.1
  */
 
@@ -183,6 +183,22 @@ namespace matrix {
 		(*this) *= scalar;
 
 		return *this;
+	}
+
+	// 
+	// getColumn (unsigned int) -> ColumnVector<M, T>
+	//
+	template <int M, int N, typename T>
+	std::vector<T> Matrix<M, N, T>::getColumn(unsigned int index) const {
+		// Check for invalid index
+		if(index >= N)
+			throw std::out_of_range("Index must be within number of columns");
+
+		std::vector<T> vec;
+		for(int i = 0; i < M; ++i)
+			vec.push_back(this->matrix[i][index]);
+
+		return std::move(vec);
 	}
 
 	//
