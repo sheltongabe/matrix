@@ -7,7 +7,7 @@
  * 	by a matrix which follows the size rules.
  *  
  *  @author		Gabriel Shelton	sheltongabe
- *  @date		  08-13-2018
+ *  @date		  08-14-2018
  *  @version	0.1
  */
 
@@ -197,6 +197,21 @@ namespace matrix {
 			Matrix<M, N, T> operator * (const T& scalar);
 
 			/**
+			 * 	@brief 	Multiply a matrix with this one and return the result
+			 * 
+			 * 	Demands the sizing requirments that normal matrix multiplication would
+			 * 	Follows the row-column rule, with an O(n^3) complexity
+			 * 	Requires T to be default-constructable
+			 * 
+			 * 	@param	const Matrix<N, R, T>&		right hand side of the multiplication
+			 * 	@return	  Matrix<M, R, T>				   The matrix after being multiplied with itself
+			 * 
+			 * 	@version 0.1
+			 */
+			template <int R = 3>
+			Matrix<M, R, T> operator * (const Matrix<N, R, T>& rhs) const;
+
+			/**
 			 * 	@brief 	Overload for an l-value of the array-subscript operator
 			 * 
 			 * 	Check that the index less than the number of rows, and if so:
@@ -227,6 +242,16 @@ namespace matrix {
 				else
 					throw std::out_of_range("Index must be within number of rows");
 			}
+
+			/**
+			 * 	@brief 	Convert the matrix to a string that can be printed
+			 * 
+			 * 	@param
+			 * 	@return 	std::string
+			 * 
+			 * 	@version 0.1
+			 */
+			explicit operator std::string() const;
 
 			/// Get a column in vector form from the matrix
 			std::vector<T> getColumn(unsigned int index) const;

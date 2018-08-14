@@ -5,7 +5,7 @@
  * 	Test each operator as it is added
  *  
  *  @author		Gabriel Shelton	sheltongabe
- *  @date		  08-13-2018
+ *  @date		  08-14-2018
  *  @version	0.1
  */
 
@@ -61,6 +61,20 @@ int main() {
 		a *= 3;
 		if(a != Matrix<4, 100, int>(15))
 			return 1;
+	}
+
+	// ----- Multiplication-by-a-matrix Test -----
+	{
+		Matrix<2, 2> A;
+		A[0][0] = 1.0;
+		A[0][1] = 2.0;
+		A[1][0] = 3.0;
+		A[1][1] = 4.0;
+		Matrix<2, 2> B(3.5);
+
+		Matrix<2, 2> C = A * B;
+
+		std::cout << static_cast<std::string>(C) << std::endl;
 	}
 
 	// ----- Array subscript -----

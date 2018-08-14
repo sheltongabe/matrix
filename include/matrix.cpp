@@ -5,7 +5,7 @@
  * 	Details
  *  
  *  @author		Gabriel Shelton	sheltongabe
- *  @date		  08-13-2018
+ *  @date		  08-14-2018
  *  @version	0.1
  */
 
@@ -183,6 +183,56 @@ namespace matrix {
 		(*this) *= scalar;
 
 		return *this;
+	}
+
+	//
+	// operator * (const Matrix<N, R, T>&) -> Matrix<M, R, T>
+	//
+	template <int M, int N, typename T>
+	template <int R>
+	Matrix<M, R, T> Matrix<M, N, T>::operator * (const Matrix<N, R, T>& rhs) const {
+		Matrix<M, R, T> result;
+
+		// Move over the rows of the lhs (this->matrix)
+		for(int rowIndex = 0; rowIndex < M; ++rowIndex) {
+			std::vector<T> resultRow(N);
+			const auto& leftRow = (*this)[rowIndex];
+
+			// Move over the columns over the rhs matrix
+			for(int columnIndex = 0; columnIndex < R; ++columnIndex) {
+				const auto& rightColumn = rhs.getColumn(columnIndex);
+				
+				// Value of the linear combination of leftRow and rightColumn
+				T value = T();
+				for(int i = 0; i < R; ++i) 
+					value += leftRow[i] * rightColumn[i];
+				
+				resultRow[columnIndex] = std::move(value);
+			}
+
+			result[rowIndex] = std::move(resultRow);
+		}
+
+		return std::move(result);
+	}
+
+	//
+	// operator std::string() const
+	//
+	template <int M, int N, typename T>
+	Matrix<M, N, T>::operator std::string() const {
+		std::string result;
+
+		// Move through the rows
+		for(int row = 0; row < M; ++ row) {
+			for(int column = 0; column < N; ++column) {
+				result += std::to_string(((*this)[row][column]));
+				result += "\t|\t";
+			}
+			result += '\n';
+		}
+
+		return std::move(result);
 	}
 
 	// 
